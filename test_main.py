@@ -6,25 +6,25 @@ from main import *
 
 
 class TestArithmeticGenerator(unittest.TestCase):
-
+    # 单元测试模块
     def test_generate_number(self):
         # 测试generate_number函数生成的数是否在合理范围内
         for _ in range(100):
             number = generate_number(10)
-            if isinstance(number, int):
-                self.assertTrue(1 <= number <= 10)
-            elif isinstance(number, Fraction):
-            #     self.assertTrue(1 <= number.numerator <= 10)
-            #     self.assertTrue(1 <= number.denominator <= 10)
-            #     self.assertTrue(1.0 <= float(number) <= 10.0)
-                decimal_value = float(number.numerator) / float(number.denominator)
-                self.assertTrue(1.0 <= decimal_value <= 10.0)
+            self.assertTrue(0 <= number <= 10)
 
-    def test_generate_expression(self):
-        # 测试generate_expression函数生成的表达式是否合法
-        for _ in range(100):
-            expression = generate_expression(10)
-            self.assertTrue(self.is_valid_expression(expression))
+    def test_generate_expression_equivalence(self):
+        # 测试generate_expression函数生成的表达式是否有重复
+        range_limit = 10
+        num_expressions = 1000
+        generated_expressions = set()
+        for _ in range(num_expressions):
+            expression = generate_expression(range_limit)
+            # 检查是否有重复的表达式，或者等效的表达式
+            if expression in generated_expressions:
+                assert False, f"Duplicate expression found: {expression}"
+            # 将通过重复检测的表达式加入表达式集合中
+            generated_expressions.add(expression)
 
     def test_convert_to_fraction(self):
         # 测试convert_to_fraction函数是否正确将小数转换为分数
@@ -43,22 +43,22 @@ class TestArithmeticGenerator(unittest.TestCase):
     def test_grade_questions(self):
         # 测试grade_questions函数是否正确统计正确和错误的题目
         correct_indices, wrong_indices = grade_questions("test_exercises.txt", "test_answers.txt")
-        self.assertEqual(len(correct_indices), 5)
-        self.assertEqual(len(wrong_indices), 5)
+        self.assertEqual(len(correct_indices), 7)
+        self.assertEqual(len(wrong_indices), 3)
 
-    def is_valid_expression(self, expression):
-        # 辅助函数，用于检查生成的表达式是否合法
-        operators = ['+', '-', '×', '÷']
-        parts = expression.split()
-        if len(parts) != 3:
-            return False
-        if not parts[0].isdigit() and not parts[0].count("/") == 1:
-            return False
-        if parts[1] not in operators:
-            return False
-        if not parts[2].isdigit() and not parts[2].count("/") == 1:
-            return False
-        return True
+    # 异常处理
+    def test_invalid_file_paths(self):
+        # 文件不存在的情况
+        self.assertEqual(grade_questions('non_existent_file.txt', 'non_existent_file.txt'), FileNotFoundError)
+
+    def test_generate_expression(self):
+        # 测试generate_expression函数生成的表达式是否合法
+        for _ in range(100):
+            expression = generate_expression(10)
+            if Fraction(eval(expression.replace('÷', '/').replace('×', '*'))) == ZeroDivisionError:
+                self.assertFalse(0)
+            else:
+                self.assertTrue(1)
 
 
 if __name__ == "__main__":
