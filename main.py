@@ -15,26 +15,42 @@ def generate_number(range_limit):
         return random.randint(1, range_limit)
 
 
+# 用集合来存储已生成的表达式
+generated_expressions = set()
+
+
 # 生成算术表达式
 def generate_expression(range_limit):
     if range_limit < 1:
         raise ValueError("数值范围必须大于等于1")
-    num1 = generate_number(range_limit)
-    num2 = generate_number(range_limit)
-    operator = random.choice(operators)
 
-    # 保证除法结果是真分数
-    if operator == '÷':
-        while num2 == 0 or (operator == '÷' and num1 % num2 != 0):
-            num1 = generate_number(range_limit)
-            num2 = generate_number(range_limit)
+    while True:
+        num1 = generate_number(range_limit)
+        num2 = generate_number(range_limit)
+        operator = random.choice(operators)
 
-    return f"{num1} {operator} {num2}"
+        # 保证除法结果是真分数
+        if operator == '÷':
+            while num2 == 0 or (operator == '÷' and num1 % num2 != 0):
+                num1 = generate_number(range_limit)
+                num2 = generate_number(range_limit)
+
+        # 确保不会出现通过交换律得到的表达式是一样的
+        if operator in ('+', '×'):
+            num1, num2 = min(num1, num2), max(num1, num2)
+
+        expression = f"{num1} {operator} {num2}"
+
+        # 检查是否已生成过这个表达式，如果是则重新生成
+        if expression not in generated_expressions:
+            generated_expressions.add(expression)
+            return expression
 
 
 # 转换小数为分数表示
 def convert_to_fraction(decimal_result):
     return Fraction(decimal_result).limit_denominator()
+
 
 # 生成题目和答案
 def generate_questions_and_answers(num_questions, range_limit):
@@ -67,38 +83,40 @@ def grade_questions(exercise_file, answer_file):
     correct_indices = []
     wrong_indices = []
 
-    with open(exercise_file, "r", encoding='utf-8') as exercises, open(answer_file, "r", encoding='utf-8') as answers:
-        for i, (exercise, answer) in enumerate(zip(exercises, answers), start=1):
-            exercise = exercise.strip()
-            answer = answer.strip()
+    try:
+        with open(exercise_file, "r", encoding='utf-8') as exercises, open(answer_file, "r",encoding='utf-8') as answers:
+            for i, (exercise, answer) in enumerate(zip(exercises, answers), start=1):
+                exercise = exercise.strip()
+                answer = answer.strip()
 
-            # 检查题目行是否以"题目X："开头（X是题目编号）
-            if exercise.startswith("题目"):
-                parts = exercise.split("：", 1)
-                if len(parts) == 2:
-                    current_question = int(parts[0].replace("题目", "").strip())
-                    exercise = parts[1].strip()
-            # 检查答案行是否以"答案X："开头（X是题目编号）
-            if answer.startswith("答案"):
-                parts = answer.split("：", 1)
-                if len(parts) == 2:
-                    current_question = int(parts[0].replace("答案", "").strip())
-                    answer = parts[1].strip()
+                # 检查题目行是否以"题目X："开头（X是题目编号）
+                if exercise.startswith("题目"):
+                    parts = exercise.split("：", 1)
+                    if len(parts) == 2:
+                        exercise = parts[1].strip()
+                # 检查答案行是否以"答案X："开头（X是题目编号）
+                if answer.startswith("答案"):
+                    parts = answer.split("：", 1)
+                    if len(parts) == 2:
+                        answer = parts[1].strip()
 
-            try:
-                user_answer = eval(answer.replace('÷', '/').replace('×', '*'))
-                user_answer = Fraction(user_answer).limit_denominator()  # 将小数答案转换为分数表示
-                correct_answer = eval(exercise.replace('÷', '/').replace('×', '*'))
-                correct_answer = Fraction(correct_answer).limit_denominator()  # 将小数答案转换为分数表示
+                try:
+                    user_answer = eval(answer.replace('÷', '/').replace('×', '*'))
+                    user_answer = Fraction(user_answer).limit_denominator()  # 将小数答案转换为分数表示
+                    correct_answer = eval(exercise.replace('÷', '/').replace('×', '*'))
+                    correct_answer = Fraction(correct_answer).limit_denominator()  # 将小数答案转换为分数表示
 
-                if is_answer_correct(exercise, user_answer, correct_answer):
-                    correct_indices.append(i)
-                else:
-                    wrong_indices.append(i)
-            except Exception as e:
-                print(f"在评分第 {i} 题时发生错误：{e}")
+                    if is_answer_correct(exercise, user_answer, correct_answer):
+                        correct_indices.append(i)
+                    else:
+                        wrong_indices.append(i)
+                except Exception as e:
+                    print(f"在评分第 {i} 题时发生错误：{e}")
 
-    return correct_indices, wrong_indices
+        return correct_indices, wrong_indices
+    except FileNotFoundError:
+        print(f"文件不存在")
+        return FileNotFoundError
 
 
 # 保存评分结果到文件
@@ -121,18 +139,14 @@ if __name__ == "__main__":
         print(f"生成 {n} 题并保存到 Exercises.txt 和 Answers.txt 文件中")
 
     elif a == 2:
-        # e = input("请输入题目文件e：")
-        # a = input("请输入答案文件a：")
+        e = input("请输入题目文件e：")
+        a = input("请输入答案文件a：")
         # e = 'Exercises.txt'
         # a= 'Answers.txt'
-        e = 'test_exercises.txt'
-        a = 'test_answers.txt'
+        # 测试功能是否正常
+        # e = 'test_exercises.txt'
+        # a = 'test_answers.txt'
         correct_indices, wrong_indices = grade_questions(e, a)
         save_grade_to_file(correct_indices, wrong_indices)
-        print(f"评分结果已保存到 Grade.txt 文件中")
-
-
-
-
-
+        print(f"统计结果已保存到 Grade.txt 文件中")
 
