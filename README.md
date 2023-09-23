@@ -14,6 +14,10 @@
 注意：虽然在文件夹中有requirements.txt，但由于程序中所用的库均为python内置的，所以requirements.txt里内容为空，在此进行说明。
 
 main.py 为主程序
+
 test_main.py 为测试程序
+
 Exercises_10000.txt 为生成的一万道题目
+
 test_exercises.txt 和 test_answers.txt 是统计答案正确和错误数量功能的文件
+
