@@ -17,7 +17,7 @@ main.py 为主程序
 
 test_main.py 为测试程序
 
-Exercises_10000.txt 为生成的一万道题目
+Exercises_10000.txt 为生成的一万道题目，生成参数为 -n 10000 -r 100
 
 test_exercises.txt 和 test_answers.txt 是统计答案正确和错误数量功能的文件，文件里有20道题目，我们手工计算题目答案并修改10道正确答案，程序统计的结果与修改后的结果一致。
 
