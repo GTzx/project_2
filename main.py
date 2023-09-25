@@ -55,39 +55,6 @@ def generate_one_expression(range_limit):
     return expression, expression_1
 
 
-# def generate_two_expression(range_limit):
-#     num1 = generate_number(range_limit)
-#     num2 = generate_number(range_limit)
-#     num3 = generate_number(range_limit)
-#     nums = [num1, num2, num3]
-#     sort_nums = sorted(nums)
-#
-#     # 随机选择两个不同的运算符
-#     operators_subset = random.sample(operators, 2)
-#     operator1, operator2 = operators_subset[0], operators_subset[1]
-#
-#     # 保证除法结果是真分数
-#     if operator1 == '÷':
-#         while num2 == 0:
-#             num2 = generate_number(range_limit)
-#     if operator2 == '÷':
-#         while num3 == 0:
-#             num3 = generate_number(range_limit)
-#
-#     # 确保不会出现通过交换律得到的表达式是一样的
-#     if (operator1 == '+' and operator2 == '+') or (operator1 == '×' and operator2 == '×'):
-#         num1, num2, num3 = sort_nums[0], sort_nums[1], sort_nums[2]
-#
-#     # 更新表达式中的数值以确保顺序正确
-#     if operator1 == '-':
-#         num1, num2 = max(num1, num2), min(num1, num2)
-#     if operator2 == '-':
-#         num2, num3 = max(num2, num3), min(num2, num3)
-#
-#     expression = f"{num1} {operator1} {num2} {operator2} {num3}"
-#     expression_1 = f"({num1}) {operator1} ({num2}) {operator2} ({num3})"
-#     return expression, expression_1
-
 def generate_two_expression(range_limit):
     num3 = generate_number(range_limit)
     operators = ['+', '-']
@@ -170,9 +137,6 @@ def generate_questions_and_answers(num_questions, range_limit):
     for _ in range(num_questions):
         expression, expression_1 = generate_expression(range_limit)
         decimal_result = eval(expression_1.replace('÷', '/').replace('×', '*'))
-        # while decimal_result < 0:
-        #     expression, expression_1 = generate_expression(range_limit)
-        #     decimal_result = eval(expression_1.replace('÷', '/').replace('×', '*'))
         fraction_result = convert_to_fraction(decimal_result)
         if isinstance(fraction_result, int) == False and fraction_result % 1 != 0:
             fraction_result = convert_fraction(f"{Fraction(fraction_result).limit_denominator()}")
@@ -284,11 +248,11 @@ if __name__ == "__main__":
         print(f"生成 {n} 题并保存到 Exercises.txt 和 Answers.txt 文件中")
 
     elif a == 2:
-        # e = input("请输入题目文件e：")
-        # a = input("请输入答案文件a：")
-        e = 'Exercises.txt'
-        a = 'Answers.txt'
-        # 测试功能是否正常
+        e = input("请输入题目文件e：")
+        a = input("请输入答案文件a：")
+        # e = 'Exercises.txt'
+        # a = 'Answers.txt'
+        # # 测试功能是否正常
         # e = 'test_exercises.txt'
         # a = 'test_answers.txt'
         correct_indices, wrong_indices = grade_questions(e, a)
