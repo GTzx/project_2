@@ -1,6 +1,5 @@
 import math
 import random
-import re
 from fractions import Fraction
 
 # 定义运算符
